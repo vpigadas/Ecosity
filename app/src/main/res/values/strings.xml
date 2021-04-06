@@ -34,6 +34,10 @@
     <string name="address_photo">Φωτογραφικο υλικό</string>
     <string name="address_required">* υποχρεωτικό πεδίο</string>
 
+    <string name="error_login_username">username is not correct.Please try again</string>
+    <string name="error_login_password">Password is not correct.Please try again</string>
+    <string name="error_wizard_empty">Please add a valid value</string>
+
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <!-- TODO: Remove or change this placeholder text -->

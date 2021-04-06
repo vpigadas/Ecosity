@@ -1,18 +1,18 @@
 package com.vpigadas.ecosity.ui.wizard.fragment
 
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import com.google.android.material.textfield.TextInputLayout
 import com.vpigadas.ecosity.R
-import com.vpigadas.ecosity.abstraction.AbstractFragment
+import com.vpigadas.ecosity.abstraction.WizardFragment
 import com.vpigadas.ecosity.ui.wizard.AddViewTreeViewModel
 import com.vpigadas.ecosity.ui.wizard.WizardStatus
 
-class DetailsFragment : AbstractFragment(R.layout.fragment_details) {
+class DetailsFragment : WizardFragment(R.layout.fragment_details) {
     private val viewmodel: AddViewTreeViewModel by activityViewModels<AddViewTreeViewModel>()
 
     companion object {
@@ -22,10 +22,7 @@ class DetailsFragment : AbstractFragment(R.layout.fragment_details) {
 
     override fun initLayout(view: View) {
         view.findViewById<Button>(R.id.next).setOnClickListener {
-            viewmodel.dataModel.diameter =
-                view.findViewById<EditText>(R.id.edit_diameter).text.toString().toIntOrNull() ?: -1
-
-            viewmodel.sendData()
+            validateAndContinue(view)
         }
 
         view.findViewById<Button>(R.id.cancel).setOnClickListener {
@@ -57,48 +54,44 @@ class DetailsFragment : AbstractFragment(R.layout.fragment_details) {
         }
     }
 
+    private fun validateAndContinue(view: View) {
+        viewmodel.dataModel.diameter = view.findViewById<EditText>(R.id.edit_diameter).let {
+                val value = it.text.toString().toIntOrNull() ?: -1
+
+                when (value > -1) {
+                    true -> view.findViewById<TextInputLayout>(R.id.textField_diameter)?.apply {
+                        showError(this, getString(R.string.error_wizard_empty))
+                    }
+                }
+
+                value
+            }
+
+        viewmodel.sendData()
+    }
+
     override fun startOperations() {
         viewmodel.observerSurface(this, Observer { list ->
-            context?.apply {
-                view?.findViewById<AutoCompleteTextView?>(R.id.edit_surface)?.also {
-                    it.setAdapter(
-                        ArrayAdapter<String>(
-                            this, android.R.layout.simple_list_item_1, list.map { it.getName() })
-                    )
-                }
+            view?.findViewById<AutoCompleteTextView?>(R.id.edit_surface)?.apply {
+                setAutoCompleteList(this, list.map { it.getName() })
             }
         })
 
         viewmodel.observerPlant(this, Observer { list ->
-            context?.apply {
-                view?.findViewById<AutoCompleteTextView?>(R.id.edit_plant)?.also {
-                    it.setAdapter(
-                        ArrayAdapter<String>(
-                            this, android.R.layout.simple_list_item_1, list.map { it.getName() })
-                    )
-                }
+            view?.findViewById<AutoCompleteTextView?>(R.id.edit_plant)?.apply {
+                setAutoCompleteList(this, list.map { it.getName() })
             }
         })
 
         viewmodel.observerBranch(this, Observer { list ->
-            context?.apply {
-                view?.findViewById<AutoCompleteTextView?>(R.id.edit_branch)?.also {
-                    it.setAdapter(
-                        ArrayAdapter<String>(
-                            this, android.R.layout.simple_list_item_1, list.map { it.getName() })
-                    )
-                }
+            view?.findViewById<AutoCompleteTextView?>(R.id.edit_branch)?.apply {
+                setAutoCompleteList(this, list.map { it.getName() })
             }
         })
 
         viewmodel.observerCondition(this, Observer { list ->
-            context?.apply {
-                view?.findViewById<AutoCompleteTextView?>(R.id.edit_special)?.also {
-                    it.setAdapter(
-                        ArrayAdapter<String>(
-                            this, android.R.layout.simple_list_item_1, list.map { it.getName() })
-                    )
-                }
+            view?.findViewById<AutoCompleteTextView?>(R.id.edit_special)?.apply {
+                setAutoCompleteList(this, list.map { it.getName() })
             }
         })
     }
